@@ -10,7 +10,11 @@ import random
 import pandas as pd
 
 def make_driver():
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_argument("--headless")
+    # driver = webdriver.Chrome(options = chrome_options)
     driver = webdriver.Chrome()
+
     return driver
 def natural_wait(low_range = 5, high_range = 20):
     wait_time = random.uniform(low_range, high_range)
@@ -38,7 +42,7 @@ def scrap(query, r1, r2):
     wait = WebDriverWait(driver, 2)
     action = ActionChains(driver)
     driver.get(f"https://www.dawn.com/search?q={query}")
-    sleep = (input("How much wait do you want"))
+    sleep = (input("How much wait do you want\n"))
     time.sleep(0)
     page = 0
     records = []
@@ -47,7 +51,7 @@ def scrap(query, r1, r2):
     pages = driver.find_elements(By.CSS_SELECTOR, ".gsc-cursor-page")
     no_of_pages = len(pages)
     for page in range(1,no_of_pages + 1):
-        print(page)
+        print(f"Scrapping page no: {page}...")
         try:
             print("Fetching results...")
             results = driver.find_elements(By.CSS_SELECTOR,".gsc-webResult.gsc-result")
@@ -73,7 +77,10 @@ def scrap(query, r1, r2):
                     "date": date,
                     "description": description
                 })
-            nxt_button = driver.find_element(By.XPATH, f"//div[contains(@class, 'gsc-cursor-page') and @aria-label='Page {page + 1}']")
+            # -------------------------commented out next line for better understanding----------------------------------#
+
+            #nxt_button = driver.find_element(By.XPATH, f"//div[contains(@class, 'gsc-cursor-page') and @aria-label='Page {page + 1}']")
+            nxt_button = driver.find_element(By.XPATH, f"//div[@class ='gsc-cursor-page' and @aria-label='Page {page + 1}']")
             driver.execute_script("arguments[0].scrollIntoView(true);", nxt_button)
             natural_wait(3, 5)
             nxt_button.click()
@@ -91,7 +98,7 @@ def scrap(query, r1, r2):
         print("-"*40)
 
     data = pd.DataFrame(records)
-    with pd.ExcelWriter("DawnNews.xlsx", engine = "openpyxl") as writer: 
+    with pd.ExcelWriter(f"U:\\university\\4thSummerBreak\\python\\DawnNews.xlsx" , engine = "openpyxl") as writer: 
         data.to_excel(writer,index = False)
     driver.quit()
 def scrapper():
