@@ -14,6 +14,7 @@ def make_driver():
     # chrome_options.add_argument("--headless")
     # driver = webdriver.Chrome(options = chrome_options)
     driver = webdriver.Chrome()
+    #hello
 
     return driver
 def natural_wait(low_range = 5, high_range = 20):
