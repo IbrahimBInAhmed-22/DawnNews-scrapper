@@ -37,68 +37,75 @@ def inrange(r1, r2, date):
 def monthToNumber(month):
     return (datetime.strptime(month[:3].lower(),'%b').month)
 
-def scrap(query, r1, r2):
+def scrap(queries, r1, r2):
     driver = make_driver()
-    wait = WebDriverWait(driver, 2)
-    action = ActionChains(driver)
-    driver.get(f"https://www.dawn.com/search?q={query}")
-    sleep = (input("How much wait do you want\n"))
-    time.sleep(0)
-    page = 0
+    check_point = ""
     records = []
-
-    
-    pages = driver.find_elements(By.CSS_SELECTOR, ".gsc-cursor-page")
-    no_of_pages = len(pages)
-    for page in range(1,no_of_pages + 1):
-        print(f"Scrapping page no: {page}...")
+    for query in queries:
         try:
-            print("Fetching results...")
-            results = driver.find_elements(By.CSS_SELECTOR,".gsc-webResult.gsc-result")
+            check_point= query
+            wait = WebDriverWait(driver, 2)
+            action = ActionChains(driver)
+            driver.get(f"https://www.dawn.com/search?q={query}")
+            sleep = (input("How would you like to wait. \n"))
+            time.sleep(0)
+            page = 0
+            
 
-            if not results:
-                print("No more result found...")
-
-            for result in results:
-
+            
+            pages = driver.find_elements(By.CSS_SELECTOR, ".gsc-cursor-page")
+            no_of_pages = len(pages)
+            for page in range(1,no_of_pages + 1):
+                print(f"Scrapping page no: {page}...")
                 try:
-                    body = result.find_element(By.CSS_SELECTOR, ".gs-title")
-                    headline = body.text.strip()
-                    url = body.find_element(By.CSS_SELECTOR,"a").get_attribute("href")
-                    snippet = result.find_element(By.CSS_SELECTOR,".gs-snippet").text.strip()
-                    date, description = snippet.split("...")[:2]
+                    print("Fetching results...")
+                    results = driver.find_elements(By.CSS_SELECTOR,".gsc-webResult.gsc-result")
+
+                    if not results:
+                        print("No more result found...")
+
+                    for result in results:
+
+                        try:
+                            body = result.find_element(By.CSS_SELECTOR, ".gs-title")
+                            headline = body.text.strip()
+                            url = body.find_element(By.CSS_SELECTOR,"a").get_attribute("href")
+                            snippet = result.find_element(By.CSS_SELECTOR,".gs-snippet").text.strip()
+                            date, description = snippet.split("...")[:2]
+                        except Exception as e:
+                            print(f"Error while fetching result{page}, {e}")
+
+                        if inrange(r1, r2, date):
+                            records.append({
+                            "headline": headline,
+                            "url": url,
+                            "date": date,
+                            "description": description
+                        })
+                    # -------------------------commented out next line for better understanding----------------------------------#
+
+                    #nxt_button = driver.find_element(By.XPATH, f"//div[contains(@class, 'gsc-cursor-page') and @aria-label='Page {page + 1}']")
+                    nxt_button = driver.find_element(By.XPATH, f"//div[@class ='gsc-cursor-page' and @aria-label='Page {page + 1}']")
+                    driver.execute_script("arguments[0].scrollIntoView(true);", nxt_button)
+                    natural_wait(3, 5)
+                    nxt_button.click()
+                    natural_wait(2, 4)
                 except Exception as e:
-                    print(f"Error while fetching result{page}, {e}")
-
-                if inrange(r1, r2, date):
-                    records.append({
-                    "headline": headline,
-                    "url": url,
-                    "date": date,
-                    "description": description
-                })
-            # -------------------------commented out next line for better understanding----------------------------------#
-
-            #nxt_button = driver.find_element(By.XPATH, f"//div[contains(@class, 'gsc-cursor-page') and @aria-label='Page {page + 1}']")
-            nxt_button = driver.find_element(By.XPATH, f"//div[@class ='gsc-cursor-page' and @aria-label='Page {page + 1}']")
-            driver.execute_script("arguments[0].scrollIntoView(true);", nxt_button)
-            natural_wait(3, 5)
-            nxt_button.click()
-            natural_wait(2, 4)
+                    print(f"Couldn't find results: ",e)
         except Exception as e:
-            print(f"Couldn't find results: ",e)
+            print("There was an error while searching query ,", check_point)
 
 
 
-    for record in records:
-        print(f"Headline: {record['headline']}")
-        print(f"URL: {record['url']}" )
-        print(f"Date:  {record['date']}")
-        print(f"Description: {record['description']}")
-        print("-"*40)
+        for record in records:
+            print(f"Headline: {record['headline']}")
+            print(f"URL: {record['url']}" )
+            print(f"Date:  {record['date']}")
+            print(f"Description: {record['description']}")
+            print("-"*40)
 
     data = pd.DataFrame(records)
-    with pd.ExcelWriter(f"U:\\university\\4thSummerBreak\\python\\DawnNews.xlsx" , engine = "openpyxl") as writer: 
+    with pd.ExcelWriter(f"DawnNews.xlsx" , engine = "openpyxl") as writer: 
         data.to_excel(writer,index = False)
     driver.quit()
 def scrapper():
@@ -112,7 +119,7 @@ def scrapper():
     #     if y and m and d and y1 and m1 and d1:
     #         break
     # query = input("Enter the city name whose news you want to extract...")
-    query = "Lahore"
+    query = ["Lahore", "quetta"]
     scrap(query, r1, r2)
 
 def main():
