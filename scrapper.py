@@ -25,7 +25,12 @@ def DawnNewsScrapper(queries, r1, r2, driver, current_page = 1, records = []):
             for page in range(current_page,no_of_pages):
 
 
-
+                nxt_button = driver.find_element(By.XPATH, f"//div[@class ='gsc-cursor-page' and @aria-label='Page {page + 1}']")
+                driver.execute_script("arguments[0].scrollIntoView(true);", nxt_button)
+                natural_wait(3, 5)
+                nxt_button.click()
+                natural_wait(3, 5)
+                
                 print(f"Scrapping page no: {page}...")
                 current_page = page 
                 if (BotDetected(driver, page)):
@@ -66,11 +71,7 @@ def DawnNewsScrapper(queries, r1, r2, driver, current_page = 1, records = []):
                     # -------------------------commented out next line for better understanding----------------------------------#
 
                     #nxt_button = driver.find_element(By.XPATH, f"//div[contains(@class, 'gsc-cursor-page') and @aria-label='Page {page + 1}']")
-                    nxt_button = driver.find_element(By.XPATH, f"//div[@class ='gsc-cursor-page' and @aria-label='Page {page + 1}']")
-                    driver.execute_script("arguments[0].scrollIntoView(true);", nxt_button)
-                    natural_wait(3, 5)
-                    nxt_button.click()
-                    natural_wait(3, 5)
+
                 
                 except Exception as e:
                     print(f"Error while finding results: ",e)
