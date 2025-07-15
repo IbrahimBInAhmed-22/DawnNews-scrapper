@@ -1,12 +1,4 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-import pandas as pd
 
-from utilities import make_driver, natural_wait, inrange, monthToNumber
-from scrapper import DawnNewsScrapper
 from printRecords import PrintRecords
 from scrapWrapper import wrapper
 from fileHandling import saveToFile
