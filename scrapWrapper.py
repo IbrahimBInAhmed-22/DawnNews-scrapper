@@ -7,9 +7,11 @@ def wrapper(queries, r1 , r2, records =[]):
     check_point = ""
 
     tries = 0
+    manual_removal = False
     while(True):
         try:
             natural_wait(5,6)
+            manual_removal = False
             result = DawnNewsScrapper(queries, r1, r2, driver, current_page, records)
             if result is None:
                 tries = 0
@@ -19,12 +21,14 @@ def wrapper(queries, r1 , r2, records =[]):
             if tries > 2:
                 print("The CAPTCHA couldn't be removed automatically (remove it manually)")
                 input("Press any key to continue...")
+                manual_removal = True
                 
-                
+        
             query, current_page = result
             queries = queries[queries.index(query): ]
-            driver.quit()
-            driver = make_driver()
+            if not manual_removal:
+                driver.quit()
+                driver = make_driver()
         
         except Exception as e:
             print("Error ocurred while solving CAPTCHA, ERROR: ", e)
