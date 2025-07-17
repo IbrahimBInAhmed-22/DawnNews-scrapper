@@ -24,5 +24,8 @@ def main():
     # query = input("Enter the city name whose news you want to extract...")
     query = [ "Lahore", "quetta"]
     DawnNews(query, r1, r2)
-main()
+
+
+if __name__ == "__main__":
+    main()
 

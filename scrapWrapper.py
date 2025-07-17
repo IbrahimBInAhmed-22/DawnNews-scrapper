@@ -4,16 +4,17 @@ from scrapper import DawnNewsScrapper
 def wrapper(queries, r1 , r2, records =[]):
     driver = make_driver()
     current_page  = 1
-    check_point = ""
+    
 
     tries = 0
     manual_removal = False
+    prePage = 0
     while(True):
         try:
             natural_wait(5,6)
             manual_removal = False
-            result = DawnNewsScrapper(queries, r1, r2, driver, current_page, records)
-            if result is None:
+            check_point = DawnNewsScrapper(queries, r1, r2, driver, current_page, records)
+            if check_point is None:
                 tries = 0
                 break
 
@@ -23,8 +24,10 @@ def wrapper(queries, r1 , r2, records =[]):
                 input("Press any key to continue...")
                 manual_removal = True
                 
-        
-            query, current_page = result
+            prePage = current_page
+            query, current_page = check_point
+            if prePage != current_page:
+                tries = 0
             queries = queries[queries.index(query): ]
             if not manual_removal:
                 driver.quit()
